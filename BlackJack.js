@@ -27,6 +27,7 @@ const CARD_VALUE = {
 
 const SUITS = ["♥️", "♦️", "♣️", "♠️"];
 
+//create the deck 
 const createDeck = () => {
     const deck = [];
     for(const suit of SUITS){
@@ -37,6 +38,8 @@ const createDeck = () => {
     return deck; 
 }
 
+
+//shuffle the existing deck, this is done multiple times wiht thte same deck 
 const shufflingDeck = (deck) => {
     
     const shuffledDeck = []; 
@@ -64,42 +67,45 @@ const placeBet = (userBalance) => {
 
 const playGame = (deck) => {
     //return true or false of the player won
+    
+    //and array fro the dealers and the players cards 
     const playerCards = []; 
-    const dealerCards = []
+    const dealerCards = []; 
     playerCards.push(deck[0], deck[2]); 
     dealerCards.push(deck[1], deck[3]); 
+
+    //show 3/4 of the cards 
     console.log("Players Cards On the Turn"); 
     console.log(playerCards[0].faceCard + playerCards[0].suit + ' ' + playerCards[1].faceCard + playerCards[1].suit);
     console.log("Dealers cards on the turn "); 
     console.log(dealerCards[0].faceCard + dealerCards[0].suit + "▮"); 
+    console.log(dealerCards[0].faceCard + dealerCards[0].suit + ' ' + dealerCards[1].faceCard + dealerCards[1].suit);
     let playerTotal = playerCards[0].cardNumber + playerCards[1].cardNumber; 
+    let dealerTotal = dealerCards[0].cardNumber + dealerCards[1].cardNumber; 
 
     
-        if(playerCards[0].cardNumber === 10){
-            if(playerCards[1].faceCard === 'A'){
-                console.log("Player BlackJack"); 
-                return true; 
-            }
-        }
-        else if(playerCards[0].faceCard === 'A'){
-            if(playerCards[1].cardNumber === 10){
+        if(playerCards[0].cardNumber === 10 && playerCards[1].faceCard === 'A'){
                 console.log(" YOU WIN Player BlackJack"); 
                 return true; 
-            }
         }
-        else if(dealerCards[0].faceCard === 'A'){
-            if(dealerCards[1].cardNumber === 10){
+        else if(playerCards[1].cardNumber === 10 && playerCards[0].faceCard === 'A'){
+            
+                console.log(" YOU WIN Player BlackJack"); 
+                return true; 
+            
+        }
+        else if(dealerCards[1].cardNumber === 10 && dealerCards[0].faceCard === 'A'){
                 console.log("YOU LOSE Banker BlackJack"); 
                 console.log(dealerCards[0].faceCard + dealerCards[0].suit + dealerCards[1].faceCard + dealerCards[1].suit); 
                 return false; 
             }
-        }
-       else if(dealerCards[0].cardNumber === 10){
-            if(dealerCards[1].faceCard === 'A'){
+        
+         else if(dealerCards[0].cardNumber === 10 && dealerCards[1].faceCard === 'A'){
+            
                 console.log("YOU LOSE Banker BlackJack"); 
                 console.log(dealerCards[0].faceCard + dealerCards[0].suit + dealerCards[1].faceCard + dealerCards[1].suit); 
                 return false; 
-            }
+            
         }
         else{
             while(true){
@@ -114,7 +120,7 @@ const playGame = (deck) => {
                             
                         }
                         counter++; 
-                        
+
                         if(playerTotal > 21){
                             console.log("YOU LOSE"); 
                             return false;
@@ -136,10 +142,12 @@ const playGame = (deck) => {
                         }
         
                     }
+                    else{
+                        console.log("Player Stays at " + playerTotal); 
+                        console.log("dealer at " + dealerTotal); 
+                    }
                 }
-                else{
-                    console.log("Please enter (h) for hit or (s) for stay"); 
-                }
+               
         
             }
 
