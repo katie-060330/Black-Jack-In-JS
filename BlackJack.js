@@ -8,6 +8,9 @@
 
 
 const prompt = require("prompt-sync")();
+let playerTotal; 
+let push; 
+let isPlayer21; 
 
 const CARD_VALUE = {
     "A": 11,
@@ -80,17 +83,19 @@ const playGame = (deck) => {
     console.log("Dealers cards on the turn "); 
     console.log(dealerCards[0].faceCard + dealerCards[0].suit + "▮"); 
     console.log(dealerCards[0].faceCard + dealerCards[0].suit + ' ' + dealerCards[1].faceCard + dealerCards[1].suit);
-    let playerTotal = playerCards[0].cardNumber + playerCards[1].cardNumber; 
+     playerTotal = playerCards[0].cardNumber + playerCards[1].cardNumber; 
     let dealerTotal = dealerCards[0].cardNumber + dealerCards[1].cardNumber; 
 
     
-        if(playerCards[0].cardNumber === 10 && playerCards[1].faceCard === 'A'){
+      if(playerCards[0].cardNumber === 10 && playerCards[1].faceCard === 'A'){
                 console.log(" YOU WIN Player BlackJack"); 
+                isPlayer21 = true; 
                 return true; 
         }
         else if(playerCards[1].cardNumber === 10 && playerCards[0].faceCard === 'A'){
             
                 console.log(" YOU WIN Player BlackJack"); 
+                isPlayer21 = true; 
                 return true; 
             
         }
@@ -111,60 +116,72 @@ const playGame = (deck) => {
             while(true){
                 let hitStay = prompt("You have a total of " + playerTotal  + " do you want to HIT (h) or STAY (s): "); 
                 let counter = 4; 
+                let cardCounter = 3; 
                 if (hitStay === 's' || hitStay === 'h'){
                     if(hitStay === 'h'){
                         playerCards.push(deck[counter]);
                         playerTotal += deck[counter].cardNumber; 
-                        for( let i = 0; i < counter; i++){
-                            console.log(playerCards[i].faceCard + playerCards[i].suit + ' ');
+                        for( let i = 0; i < cardCounter; i++){
+                           
+                            process.stdout.write(playerCards[i].faceCard + playerCards[i].suit + " ");
                             
                         }
+                        console.log("\n"); 
                         counter++; 
+                        cardCounter++; 
 
-                        if(playerTotal > 21){
-                            console.log("YOU LOSE"); 
-                            return false;
-                        }
-                        else if (playerTotal === 21){
-                            console.log("YOU WIN Player BlackJack"); 
-                            return true; 
-                        }
-                        else{
-                            hitStay = prompt("You have a total of " + playerTotal  + " do you want to HIT (h) or STAY (s): "); 
-                            playerCards.push(deck[counter]);
-                            playerTotal += deck[counter].cardNumber; 
-                            for( let i = 0; i < counter; i++){
-                                console.log(playerCards[i].faceCard + playerCards[i].suit + ' ');
-                                
-                            }
-                            counter++; 
-                            
-                        }
+                        findResult(playerTotal, dealerTotal);
         
                     }
-                    else{
-                        console.log("Player Stays at " + playerTotal); 
-                        console.log("dealer at " + dealerTotal); 
+                    
+
+                        return false; 
                     }
                 }
                
         
             }
 
-           
+        
+        }  
+    
+    
 
 
+
+    
+ 
+
+
+
+
+const findResult = (playerTotal, dealerTotal) => {
+
+    if(playerTotal > 21){
+        console.log("YOU LOSE with a total of " + playerTotal); 
+        return false;
+    }
+    else if (playerTotal === 21){
+        console.log("YOU WIN Player BlackJack"); 
+        return true; 
+    }
+    else{
+        hitStay = prompt("You have a total of " + playerTotal  + " do you want to HIT (h) or STAY (s): "); 
+        playerCards.push(deck[counter]);
+        playerTotal += deck[counter].cardNumber; 
+        for( let i = 0; i < counter; i++){
+            console.log(playerCards[i].faceCard + playerCards[i].suit + ' ');
+            
         }
-    
-    
-
-    
-    return false; 
-
-
-
-
+        counter++; 
+        
+    }
 }
+
+
+
+
+
 
 const game = () =>{
 
