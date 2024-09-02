@@ -8,7 +8,6 @@
 
 
 const prompt = require("prompt-sync")();
-let playerTotal; 
 let push; 
 let isPlayer21; 
 
@@ -68,7 +67,7 @@ const placeBet = (userBalance) => {
       }
     };
 
-const playGame = (deck) => {
+const playGame = (deck, bet, balance) => {
     //return true or false of the player won
     
     //and array fro the dealers and the players cards 
@@ -83,120 +82,144 @@ const playGame = (deck) => {
     console.log("Dealers cards on the turn "); 
     console.log(dealerCards[0].faceCard + dealerCards[0].suit + "▮"); 
     console.log(dealerCards[0].faceCard + dealerCards[0].suit + ' ' + dealerCards[1].faceCard + dealerCards[1].suit);
-     playerTotal = playerCards[0].cardNumber + playerCards[1].cardNumber; 
+     let playerTotal = playerCards[0].cardNumber + playerCards[1].cardNumber; 
     let dealerTotal = dealerCards[0].cardNumber + dealerCards[1].cardNumber; 
 
-    
-      if(playerCards[0].cardNumber === 10 && playerCards[1].faceCard === 'A'){
-                console.log(" YOU WIN Player BlackJack"); 
-                isPlayer21 = true; 
-                return true; 
-        }
-        else if(playerCards[1].cardNumber === 10 && playerCards[0].faceCard === 'A'){
-            
-                console.log(" YOU WIN Player BlackJack"); 
-                isPlayer21 = true; 
-                return true; 
-            
-        }
-        else if(dealerCards[1].cardNumber === 10 && dealerCards[0].faceCard === 'A'){
-                console.log("YOU LOSE Banker BlackJack"); 
-                console.log(dealerCards[0].faceCard + dealerCards[0].suit + dealerCards[1].faceCard + dealerCards[1].suit); 
-                return false; 
-            }
-        
-         else if(dealerCards[0].cardNumber === 10 && dealerCards[1].faceCard === 'A'){
-            
-                console.log("YOU LOSE Banker BlackJack"); 
-                console.log(dealerCards[0].faceCard + dealerCards[0].suit + dealerCards[1].faceCard + dealerCards[1].suit); 
-                return false; 
-            
-        }
-        else{
-            while(true){
-                let hitStay = prompt("You have a total of " + playerTotal  + " do you want to HIT (h) or STAY (s): "); 
-                let counter = 4; 
-                let cardCounter = 3; 
-                if (hitStay === 's' || hitStay === 'h'){
-                    if(hitStay === 'h'){
-                        playerCards.push(deck[counter]);
-                        playerTotal += deck[counter].cardNumber; 
-                        for( let i = 0; i < cardCounter; i++){
-                           
-                            process.stdout.write(playerCards[i].faceCard + playerCards[i].suit + " ");
-                            
-                        }
-                        console.log("\n"); 
-                        counter++; 
-                        cardCounter++; 
+    //player cards represents the two cards the playe has after the inital turn and same for dealer cards 
+    //playerTotal and dealerTotal carry the physical total of the number 
 
-                        findResult(playerTotal, dealerTotal);
-        
-                    }
-                    
+    //first we check if the playe has 21 if this is true then the player automatically wins 
 
-                        return false; 
-                    }
-                }
-               
-        
-            }
+    //we should have a function add card to total, this way we can reuse the ficion for both plyer and dealer
 
-        
-        }  
-    
-    
-
-
-
-    
- 
-
-
-
-
-const findResult = (playerTotal, dealerTotal) => {
-
-    if(playerTotal > 21){
-        console.log("YOU LOSE with a total of " + playerTotal); 
-        return false;
+    //these are the 3 black jack cases after the first inital cards 
+    if(playerTotal == 21 && dealerTotal == 21){
+        push = true; 
+        console.log('Player Cards');
+        console.log(playerCards[0].faceCard + playerCards[0].suit + ' ' + playerCards[1].faceCard + playerCards[1].suit);
+        console.log('Dealers Cards');
+        console.log(dealerCards[0].faceCard + dealerCards[0].suit + ' ' + dealerCards[1].faceCard + dealerCards[1].suit);
+        console.log('Push: Both Black Jack');
+        return contiueToPlay(balance);
     }
-    else if (playerTotal === 21){
-        console.log("YOU WIN Player BlackJack"); 
-        return true; 
+
+    else if (playerTotal == 21 && dealerTotal != 21){
+        console.log('Player Black Jack');
+        
+        console.log('Player Cards');
+        console.log(playerCards[0].faceCard + playerCards[0].suit + ' ' + playerCards[1].faceCard + playerCards[1].suit);
+        console.log('Dealers Cards');
+        console.log(dealerCards[0].faceCard + dealerCards[0].suit + ' ' + dealerCards[1].faceCard + dealerCards[1].suit);
+        console.log('Push: Both Black Jack');
+        balance += 1.5* bet; 
+        return contiueToPlay(balance);
+
     }
+    else if (dealerTotal == 21 &&  playerTotal!= 21){
+        
+        console.log('Dealer Black Jack');
+        
+        console.log('Player Cards');
+        console.log(playerCards[0].faceCard + playerCards[0].suit + ' ' + playerCards[1].faceCard + playerCards[1].suit);
+        console.log('Dealers Cards');
+        console.log(dealerCards[0].faceCard + dealerCards[0].suit + ' ' + dealerCards[1].faceCard + dealerCards[1].suit);
+        console.log('Push: Both Black Jack');
+        balance -=  bet; 
+        return contiueToPlay(balance);
+
+    
+
+    }
+    //if no black jack cases are met then the game will go into this section
     else{
-        hitStay = prompt("You have a total of " + playerTotal  + " do you want to HIT (h) or STAY (s): "); 
-        playerCards.push(deck[counter]);
-        playerTotal += deck[counter].cardNumber; 
-        for( let i = 0; i < counter; i++){
-            console.log(playerCards[i].faceCard + playerCards[i].suit + ' ');
-            
+        //we need to get into the spesific cases
+        let hit = playerDecisioin(playerTotal);
+        if(hit){
+            //player hits 
+            return false; 
         }
-        counter++; 
+        //else we stay and let the dealer play out
+        else{
+            return false; 
+
+        }
         
+
     }
-}
+ 
+        }  
 
 
-
+       
+       
 
 
 
 const game = () =>{
 
     const deck = createDeck(); 
-    let balance = prompt("Enter a deposit ammount:  "); 
+    let balance = parseFloat(prompt("Enter a deposit amount: "));
     let continueToPlay = true; 
-    while (balance > 0 && continueToPlay){
+
+    while (continueToPlay){
         
         console.log("Your Balance is " + balance)
         const shuffleDeck = shufflingDeck(deck); 
         const bet = placeBet(balance); 
-        continueToPlay = playGame(shuffleDeck); 
+        continueToPlay = playGame(shuffleDeck, bet, balance); 
 
 
     }
 }
 game(); 
+
+
+//input to contiue to play the game 
+
+const contiueToPlay = (balance) =>{
+    if(balance <= 0){
+        console.log('you dont have enough money to play again Game end');
+        return false; 
+    }
+    else{
+        while(true){
+            let yesNo = prompt("Play again? yes(y) or no(n): "); 
+            yesNo = yesNo.toLowerCase(); 
+            if( yesNo !== 'y' && yesNo !== 'n'){
+                console.log('Please Enter y/n');
+            }
+            else if (yesNo === 'y'){
+                return true; 
+            }
+            else{
+                return false; 
+            }
+
+        }
+
+    }
+
+
+}
+
+const playerDecisioin = (playerTotal) => {
+    while (true) {
+        let input = prompt(`Hit (h) or stay (s) at ${playerTotal}: `);
+        input = input.toLowerCase(); 
+        if (input !== 'h' && input !== 's') {
+            console.log('Please enter h/s: ');
+        } else if (input === 'h') {
+            return true; 
+        } else {
+            return false; 
+        }
+    }
+}
+
+
+
+
+
+
+
 
