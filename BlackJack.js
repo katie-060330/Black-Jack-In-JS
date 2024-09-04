@@ -1,6 +1,8 @@
 const prompt = require("prompt-sync")();
 let push; 
 let isPlayer21; 
+let counter = 4; 
+let balance = 0; 
 
 const CARD_VALUE = {
     "A": 11,
@@ -59,8 +61,8 @@ const playGame = (deck, bet, balance) => {
     // Return true or false if the player won
     
     // Arrays for dealer's and player's cards
-    const playerCards = []; 
-    const dealerCards = []; 
+    let playerCards = []; 
+    let dealerCards = []; 
     playerCards.push(deck[0], deck[2]); 
     dealerCards.push(deck[1], deck[3]); 
 
@@ -84,44 +86,114 @@ const playGame = (deck, bet, balance) => {
         console.log('Push: Both Blackjack');
         return continueToPlay(balance);
     } else if (playerTotal == 21 && dealerTotal != 21) {
-        console.log('Player Blackjack');
+      
         console.log('Player Cards');
         console.log(playerCards[0].faceCard + playerCards[0].suit + ' ' + playerCards[1].faceCard + playerCards[1].suit);
         console.log('Dealer Cards');
         console.log(dealerCards[0].faceCard + dealerCards[0].suit + ' ' + dealerCards[1].faceCard + dealerCards[1].suit);
-        console.log('Player wins!');
+        console.log('Player Blackjack Player wins!');
         balance += 1.5 * bet; 
         return continueToPlay(balance);
     } else if (dealerTotal == 21 && playerTotal != 21) {
-        console.log('Dealer Blackjack');
+       
         console.log('Player Cards');
         console.log(playerCards[0].faceCard + playerCards[0].suit + ' ' + playerCards[1].faceCard + playerCards[1].suit);
         console.log('Dealer Cards');
         console.log(dealerCards[0].faceCard + dealerCards[0].suit + ' ' + dealerCards[1].faceCard + dealerCards[1].suit);
-        console.log('Dealer wins!');
+        console.log('Dealer Blackjack Dealer wins!');
         balance -= bet; 
         return continueToPlay(balance);
     } else {
         //counter keeps track of where the new card needs to be dreawn from
-        let counter = 4; 
+        
         let hit = playerDecision(playerTotal);
         if (hit) {
             // Player hits
-            playerTotal = addCard(playerCards, playerTotal, counter, deck); 
-            counter++; 
-            console.log(playerCards);
-            return false; 
-        } else {
+            //return array with updated array and updated player total
+            while(hit){
+                let temp = addCard(playerCards, playerTotal, counter, deck); 
+                playerTotal = temp[0];
+                playerCards = temp[1]; 
+                counter++; 
+                showCards(playerCards); 
+                if(playerTotal>21){
+                    console.log('Player Bust');
+                    return false; 
+
+                }
+                hit = playerDecision(playerTotal);
+                
+
+            }
+           
+
+        } 
             // Player stays, let dealer play out
-            return false; 
-        }
+            while(dealerTotal <= 16){
+                let tmp = addCard(dealerCards, dealerTotal, counter, deck); 
+                counter++;
+                dealerTotal = tmp[0]; 
+                dealerCards = tmp[1]; 
+                if(dealerTotal >= 17){
+                    break; 
+                }
+               }
+               if(dealerTotal> 22){
+                console.log('Player Win, dealer bust');
+                showCards(playerCards, dealerCards);
+                    balance += 2*bet; 
+
+               }
+               if(dealerTotal >= 17){
+                if(playerTotal > dealerTotal){
+                    console.log('Player Win');
+                    
+                showCards(playerCards, dealerCards);
+                    balance += 2*bet; 
+                }
+                else if (playerTotal === dealerTotal){
+                    
+                    console.log('Push');
+                    
+                showCards(playerCards, dealerCards);
+                balance += bet
+                }
+                else{
+                    console.log('Player Loses');
+                    
+                showCards(playerCards, dealerCards);
+                    balance-= bet; 
+                }
+            }
+           
+
+        
     }
+    
 }  
 
 const addCard = (array, total, counter, deck) => {
-    array.push(deck[counter]); 
-    return total + deck[counter].cardNumber; 
+   
+    let updatedArray = [...array, deck[counter]];
+
+    
+    return [total + deck[counter].cardNumber, updatedArray];
 }
+
+const showCards = (player, dealer) =>{
+    console.log('Player cards');
+    for(let card of player){
+        console.log(card.faceCard + card.suit);
+    }
+    console.log('Dealer cards');
+    for(let card of dealer){
+        console.log(card.faceCard + card.suit);
+    }
+
+}
+
+
+
 
 const continueToPlay = (balance) => {
     if (balance <= 0) {
@@ -134,7 +206,7 @@ const continueToPlay = (balance) => {
             if (yesNo !== 'y' && yesNo !== 'n') {
                 console.log('Please enter y/n');
             } else if (yesNo === 'y') {
-                return true; 
+                return false; 
             } else {
                 return false; 
             }
@@ -146,11 +218,14 @@ const playerDecision = (playerTotal) => {
     while (true) {
         let input = prompt(`Hit (h) or stay (s) at ${playerTotal}: `);
         input = input.toLowerCase(); 
+        
         if (input !== 'h' && input !== 's') {
             console.log('Please enter h/s: ');
         } else if (input === 'h') {
             return true; 
-        } else {
+        } 
+        
+        else {
             return false; 
         }
     }
@@ -158,7 +233,7 @@ const playerDecision = (playerTotal) => {
 
 const game = () => {
     const deck = createDeck(); 
-    let balance = parseFloat(prompt("Enter a deposit amount: "));
+     balance = parseFloat(prompt("Enter a deposit amount: "));
     let continueToPlayGame = true; 
 
     while (continueToPlayGame) {
